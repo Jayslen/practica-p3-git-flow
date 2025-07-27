@@ -65,7 +65,37 @@ class MyCLI(cmd.Cmd):
             "updated_at": f"{datetime.now()}",
         }
 
+    def do_list(self, line):
+        tasks_to_show = []
+        task_txt = ""
+        if line.strip() not in tasks_status or len(line.strip()) == 0:
+            print("Showing all the tasks")
+            tasks_to_show = self.tasks
+        else:
+            tasks_to_show = [x for x in self.tasks if x["status"] == line]
+            task_txt = line
 
+        if len(self.tasks) == 0:
+            print("No tasks to show")
+            return None
+
+        rows = [list(x.values()) for x in tasks_to_show]
+        columns = list(self.tasks[0].keys())
+
+        table = Table(title=f"Tasks {task_txt}", show_lines=True, box=box.DOUBLE_EDGE)
+        console = Console()
+
+        for x in columns:
+            table.add_column(x)
+
+        for x in rows:
+            row = list(x)
+            row[0] = str(row[0])
+            row[1] = row[1].capitalize()
+            row[2] = row[2].capitalize()
+            table.add_row(*row, style="magenta")
+
+        console.print(table)
 
     def do_add(self, line):
         if len(line.strip()) < 4:
@@ -77,5 +107,6 @@ class MyCLI(cmd.Cmd):
         self.id = self.tasks[len(self.tasks) - 1]["id"] + 1
         self.update_file()
         print(f"Task {line.upper()} added")
+
 if __name__ == "__main__":
     MyCLI().cmdloop()
