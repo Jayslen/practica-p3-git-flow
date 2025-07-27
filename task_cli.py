@@ -56,5 +56,25 @@ class MyCLI(cmd.Cmd):
         with open("tasks.json", "w") as f:
             json.dump(self.tasks, f)
 
+
+    def do_update(self, line):
+        task_id, *description = line.split(" ")
+        selected_task_index = None
+        try:
+            selected_task_index = self.search_task(
+                first=0, last=len(self.tasks), id=int(task_id), list=self.tasks
+            )
+            if selected_task_index is None:
+                print("There is no task with that id, try with other one")
+            else:
+                None
+                self.tasks[selected_task_index]["task"] = " ".join(description)
+                self.update_file()
+                print(f"Task {task_id} updated")
+        except ValueError:
+            print("Id not valid, must be a number")
+            return None
+        
+    
 if __name__ == "__main__":
     MyCLI().cmdloop()
