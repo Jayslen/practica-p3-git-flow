@@ -45,6 +45,17 @@ class MyCLI(cmd.Cmd):
             "You can perform certaint actions with these commands \n help: Get all the commands \n add: Add a task \n list: show all task saved \n list done: show all done tasks \n list in progress: show all task in progress \n list todo: show task to do \n mark_done {id}: mark the task selected as done \n mark_in_progress {id}:mark the task selected as in progress \n delete {id} delete a task providing the id of it \n update {id} new name: Edit a taks"
         )
 
+    def create_task(self, name):
+        return {
+            "id": self.id,
+            "task": name.lower(),
+            "status": task_todo.lower(),
+            "created_at": f"{datetime.now()}",
+            "updated_at": f"{datetime.now()}",
+        }
+
+
+
     def do_add(self, line):
         if len(line.strip()) < 4:
             print("Task name too short try other")
