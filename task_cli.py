@@ -167,6 +167,6 @@ class MyCLI(cmd.Cmd):
         except ValueError:
             print("Id not valid, must be a number")
             return None
-        
+          
 if __name__ == "__main__":
     MyCLI().cmdloop()
