@@ -52,6 +52,12 @@ class MyCLI(cmd.Cmd):
         except IndexError:
             None
 
+    def do_mark_in_progress(self, line):
+        self.update_status(id=line, status=task_in_progress)
+
+    def do_mark_done(self, line):
+        self.update_status(id=line, status=task_done)
+        
     def update_file(self):
         with open("tasks.json", "w") as f:
             json.dump(self.tasks, f)
@@ -162,6 +168,5 @@ class MyCLI(cmd.Cmd):
             print("Id not valid, must be a number")
             return None
         
-    
 if __name__ == "__main__":
     MyCLI().cmdloop()
