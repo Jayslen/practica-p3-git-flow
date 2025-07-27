@@ -65,6 +65,71 @@ class MyCLI(cmd.Cmd):
             "updated_at": f"{datetime.now()}",
         }
 
+    def search_task(self, list, id: int, first, last):
+        if type(id) is not int:
+            return None
+
+        if first > last:
+            return None
+
+        midpoint = (first + last) // 2
+
+        if midpoint >= len(list):
+            return None
+
+        if list[midpoint]["id"] == id:
+            return midpoint
+        elif list[midpoint]["id"] > id:
+            return self.search_task(list, id, first, midpoint - 1)
+        else:
+            return self.search_task(list, id, midpoint + 1, last)
+
+    def do_list(self, line):
+        tasks_to_show = []
+        task_txt = ""
+        if line.strip() not in tasks_status or len(line.strip()) == 0:
+            print("Showing all the tasks")
+            tasks_to_show = self.tasks
+        else:
+            tasks_to_show = [x for x in self.tasks if x["status"] == line]
+            task_txt = line
+
+        if len(self.tasks) == 0:
+            print("No tasks to show")
+            return None
+
+        rows = [list(x.values()) for x in tasks_to_show]
+        columns = list(self.tasks[0].keys())
+
+        table = Table(title=f"Tasks {task_txt}", show_lines=True, box=box.DOUBLE_EDGE)
+        console = Console()
+
+        for x in columns:
+            table.add_column(x)
+
+        for x in rows:
+            row = list(x)
+            row[0] = str(row[0])
+            row[1] = row[1].capitalize()
+            row[2] = row[2].capitalize()
+            table.add_row(*row, style="magenta")
+
+        console.print(table)
+
+    def do_delete(self, line):
+        try:
+            selected_task_index = self.search_task(
+                first=0, last=len(self.tasks), id=int(line), list=self.tasks
+            )
+            if selected_task_index is None:
+                print("There is no task with that id, try with other one")
+            else:
+                print(f"Task {self.tasks[selected_task_index]['task'].upper()} deleted")
+                self.tasks.pop(selected_task_index)
+                self.update_file()
+        except ValueError:
+            print("Id not valid, must be a number")
+            return None
 
 
     def do_add(self, line):
@@ -77,5 +142,6 @@ class MyCLI(cmd.Cmd):
         self.id = self.tasks[len(self.tasks) - 1]["id"] + 1
         self.update_file()
         print(f"Task {line.upper()} added")
+
 if __name__ == "__main__":
     MyCLI().cmdloop()
