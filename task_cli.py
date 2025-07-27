@@ -44,7 +44,18 @@ class MyCLI(cmd.Cmd):
         console.print(
             "You can perform certaint actions with these commands \n help: Get all the commands \n add: Add a task \n list: show all task saved \n list done: show all done tasks \n list in progress: show all task in progress \n list todo: show task to do \n mark_done {id}: mark the task selected as done \n mark_in_progress {id}:mark the task selected as in progress \n delete {id} delete a task providing the id of it \n update {id} new name: Edit a taks"
         )
+  
+     def update_tasks(self, value):
+        self.tasks = value
+        try:
+            self.id = value[-1]["id"] + 1
+        except IndexError:
+            None
 
+    def update_file(self):
+        with open("tasks.json", "w") as f:
+            json.dump(self.tasks, f)
+    
     def create_task(self, name):
         return {
             "id": self.id,
@@ -66,6 +77,5 @@ class MyCLI(cmd.Cmd):
         self.id = self.tasks[len(self.tasks) - 1]["id"] + 1
         self.update_file()
         print(f"Task {line.upper()} added")
-
 if __name__ == "__main__":
     MyCLI().cmdloop()
