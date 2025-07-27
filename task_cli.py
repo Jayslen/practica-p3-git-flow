@@ -45,6 +45,25 @@ class MyCLI(cmd.Cmd):
             "You can perform certaint actions with these commands \n help: Get all the commands \n add: Add a task \n list: show all task saved \n list done: show all done tasks \n list in progress: show all task in progress \n list todo: show task to do \n mark_done {id}: mark the task selected as done \n mark_in_progress {id}:mark the task selected as in progress \n delete {id} delete a task providing the id of it \n update {id} new name: Edit a taks"
         )
 
+    def search_task(self, list, id: int, first, last):
+        if type(id) is not int:
+            return None
+
+        if first > last:
+            return None
+
+        midpoint = (first + last) // 2
+
+        if midpoint >= len(list):
+            return None
+
+        if list[midpoint]["id"] == id:
+            return midpoint
+        elif list[midpoint]["id"] > id:
+            return self.search_task(list, id, first, midpoint - 1)
+        else:
+            return self.search_task(list, id, midpoint + 1, last)
+
     def do_list(self, line):
         tasks_to_show = []
         task_txt = ""
@@ -76,6 +95,21 @@ class MyCLI(cmd.Cmd):
             table.add_row(*row, style="magenta")
 
         console.print(table)
+
+    def do_delete(self, line):
+        try:
+            selected_task_index = self.search_task(
+                first=0, last=len(self.tasks), id=int(line), list=self.tasks
+            )
+            if selected_task_index is None:
+                print("There is no task with that id, try with other one")
+            else:
+                print(f"Task {self.tasks[selected_task_index]['task'].upper()} deleted")
+                self.tasks.pop(selected_task_index)
+                self.update_file()
+        except ValueError:
+            print("Id not valid, must be a number")
+            return None
 
 if __name__ == "__main__":
     MyCLI().cmdloop()
